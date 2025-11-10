@@ -1,10 +1,3 @@
-/**
- * 🧠 MD NEET-PG Question Generator Backend
- * ----------------------------------------
- * Generates NEET-PG / AIIMS / USMLE-level MCQs using Google Gemini API.
- * Does NOT save questions; returns JSON directly to frontend.
- */
-
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
@@ -13,13 +6,11 @@ const app = express();
 
 dotenv.config();
 
-// Middleware
+
 app.use(express.json());
-app.use(cors()); // ✅ Enable CORS for all origins
-// --------------------
-// 🔧 Configuration
-// --------------------
-const PORT = process.env.PORT || 3000;
+app.use(cors());
+
+const PORT = process.env.PORT || 4000;
 const API_KEY = process.env.GL_API_KEY || "YOUR_GEMINI_API_KEY_HERE";
 const MODEL = process.env.MODEL || "gemini-2.0-flash";
 const API_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
@@ -30,16 +21,10 @@ if (!API_KEY || API_KEY === "YOUR_GEMINI_API_KEY_HERE") {
 
 app.use(express.json());
 
-// --------------------
-// ✅ Root route
-// --------------------
 app.get("/", (req, res) => {
   res.send("🧠 MD NEET-PG Question Generator Backend is running!");
 });
 
-// --------------------
-// 🧩 Generate MCQs Endpoint
-// --------------------
 app.post("/generate", async (req, res) => {
   try {
     const { topic } = req.body;
@@ -48,7 +33,6 @@ app.post("/generate", async (req, res) => {
       return res.status(400).json({ error: "Please provide a topic name." });
     }
 
-    // 🧠 Prompt sent to Gemini
     const prompt = `
 You are an expert NEET-PG question setter and medical educator.
 
@@ -58,7 +42,7 @@ Requirements:
 - Difficulty: NEET-PG / AIIMS / USMLE-level.
 - Include a mix of conceptual, clinical, and case-based questions.
 - Include both medium (30%) and hard (70%) conceptual mixes (100% hard-creative).
-- Each question must have 4 options (A–D).
+- Each question must have 4 options (A-D).
 - Include a detailed explanation for the correct answer.
 - Output MUST be strictly valid JSON in the following structure:
 
@@ -87,9 +71,6 @@ Requirements:
 Do NOT include any text outside the JSON (no markdown, no commentary).
 `;
 
-    // --------------------
-    // 🌐 Call Gemini API
-    // --------------------
     const response = await fetch(
       `${API_BASE}/${MODEL}:generateContent?key=${API_KEY}`,
       {
@@ -103,7 +84,6 @@ Do NOT include any text outside the JSON (no markdown, no commentary).
 
     const data = await response.json();
 
-    // Handle API errors gracefully
     if (data.error) {
       return res.status(500).json({ error: data.error.message });
     }
@@ -114,14 +94,10 @@ Do NOT include any text outside the JSON (no markdown, no commentary).
       return res.status(500).json({ error: "No content returned from model." });
     }
 
-    // --------------------
-    // 🧩 Parse JSON safely
-    // --------------------
     let parsed;
     try {
       parsed = JSON.parse(text);
     } catch (err) {
-      // If model includes extra text, attempt to extract JSON
       const start = text.indexOf("{");
       const end = text.lastIndexOf("}");
       if (start !== -1 && end !== -1) {
@@ -131,22 +107,16 @@ Do NOT include any text outside the JSON (no markdown, no commentary).
       }
     }
 
-    // --------------------
-    // ✅ Send Response
-    // --------------------
     res.status(200).json({
       success: true,
       data: parsed,
     });
   } catch (error) {
-    console.error("❌ Error generating questions:", error);
+    console.error("Error generating questions:", error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// --------------------
-// 🚀 Start Server
-// --------------------
 app.listen(PORT, () => {
-  console.log(`✅ Backend running at: http://localhost:${PORT}`);
+  console.log(`Backend running at: http://localhost:${PORT}`);
 });
