@@ -8,7 +8,6 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
-const serverless = require('serverless-http');  
 
 const app = express();
 
@@ -148,8 +147,6 @@ Do NOT include any text outside the JSON (no markdown, no commentary).
 // --------------------
 // 🚀 Start Server
 // --------------------
-// app.listen(PORT, () => {
-//   console.log(`✅ Backend running at: http://localhost:${PORT}`);
-// });
-
-module.exports.handler = serverless(app);
+app.listen(PORT, () => {
+  console.log(`✅ Backend running at: http://localhost:${PORT}`);
+});
