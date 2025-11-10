@@ -6,9 +6,19 @@ const app = express();
 
 dotenv.config();
 
+let corsOptions;
 
-app.use(express.json());
-app.use(cors());
+if (process.env.NODE_ENV === "production") {
+  corsOptions = {
+    origin: process.env.APP_URL
+  };
+} else {
+  corsOptions = {
+    origin: "http://localhost:3000"
+  };
+}
+
+app.use(cors(corsOptions));
 
 const PORT = process.env.PORT || 4000;
 const API_KEY = process.env.GL_API_KEY || "YOUR_GEMINI_API_KEY_HERE";
