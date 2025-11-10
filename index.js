@@ -36,7 +36,7 @@ app.post("/generate", async (req, res) => {
     const prompt = `
 You are an expert NEET-PG question setter and medical educator.
 
-Generate 2 high-quality multiple-choice questions (MCQs) for the topic: "${topic}".
+Generate 5 high-quality multiple-choice questions (MCQs) for the topic: "${topic}".
 
 Requirements:
 - Difficulty: NEET-PG / AIIMS / USMLE-level.
